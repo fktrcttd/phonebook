@@ -1,0 +1,15 @@
+GET     /                           controllers.HomeController.index
+
+#PHONE API
+GET     /phones               controllers.PhoneController.list()
+GET     /phone/getById                  controllers.PhoneController.getById(id: Long)
+GET     /phone/searchByName                  controllers.PhoneController.searchByTitle(name:String)
+GET     /phone/serachByNumber                  controllers.PhoneController.searchByNumber(number: String)
+POST     /phone/create                  controllers.PhoneController.create()
+POST     /phone/:id                  controllers.PhoneController.edit(id: Long)
+DELETE     /phone/:id               controllers.PhoneController.delete(id: Long)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+      
