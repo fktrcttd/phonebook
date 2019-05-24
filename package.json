@@ -5,7 +5,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js --hide-modules --progress",
     "dev": "sbt run",
-    "start": "npm install && webpack --config webpack.config.js --hide-modules --progress && sbt run"
+    "start": "npm install && webpack --config webpack.config.vendor.js && webpack --config webpack.config.js --hide-modules --progress && sbt run"
   },
   "devDependencies": {
     "@types/webpack-env": "*",
