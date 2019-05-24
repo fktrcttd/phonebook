@@ -75,7 +75,6 @@ export default class List extends Vue {
             "title": this.telephoneToEdit.title,
             "number": this.telephoneToEdit.number
         };
-
         axios.post(`/api/phone/${this.telephoneToEdit.id}`, JSON.stringify(data), {
             headers: {
                 'Content-Type': 'application/json',
