@@ -34,9 +34,11 @@ class PhoneController @Inject() (phonesExecutionContext: PhoneExecutionContext, 
     val exist = repo.findById(id) != null
     if (!exist){
       NotFound("Not found!")
+    }else{
+      val json = Json.toJson(repo.findById(id))
+      Ok(json)
     }
-    val json = Json.toJson(repo.findById(id))
-    Ok(json)
+    
   }
 
   def searchByTitle (term: String): Action[AnyContent] = Action {
@@ -73,19 +75,22 @@ class PhoneController @Inject() (phonesExecutionContext: PhoneExecutionContext, 
     val exist = repo.findById(id) != null
     if (!exist){
       NotFound("Not found!")
-    }
+    }else{
+      val json = request.body.asJson.get
+      json.validate[PhoneApiModel] match {
+        case success: JsSuccess[PhoneApiModel] =>
+          val phoneApiModel = success.get
+          val telIsValid  = PhoneValidator.telIsValid(phoneApiModel)
+          if (!telIsValid){
+            BadRequest("Bad phone format or title is empty")
+          }else{
+            repo.edit(id, phoneApiModel.title, phoneApiModel.number)
+            Ok("Successfully updated!")  
+          }
+          
+        case JsError(_) => BadRequest("Invalid json body!")  
+    }  
     
-    val json = request.body.asJson.get
-    json.validate[PhoneApiModel] match {
-      case success: JsSuccess[PhoneApiModel] =>
-        val phoneApiModel = success.get
-        val telIsValid  = PhoneValidator.telIsValid(phoneApiModel)
-        if (!telIsValid){
-          BadRequest("Bad phone format or title is empty")
-        }
-        repo.edit(id, phoneApiModel.title, phoneApiModel.number)
-        Ok("Successfully updated!")
-      case JsError(_) => BadRequest("Invalid json body!")
     }
   }
 
@@ -93,9 +98,11 @@ class PhoneController @Inject() (phonesExecutionContext: PhoneExecutionContext, 
     val exist = repo.findById(id) != null
     if (!exist){
       NotFound("Not found!")
+    }else{
+      repo.delete(id)
+      Ok("Successfully deleted")  
     }
-    repo.delete(id)
-    Ok("Successfully deleted")
+    
   }
   
   def writeAll: Action[AnyContent] = Action.async {

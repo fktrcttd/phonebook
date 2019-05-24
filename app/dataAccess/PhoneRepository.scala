@@ -10,7 +10,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
   
-  private val cacheByNumber = new Cache[String, Phone](10)
+  private val cache = new Cache[Long, Phone](10)
   
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -31,13 +31,13 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
 
   
   //cache init
-   /*if (cacheByNumber.isEmpty){
+   if (cache.isEmpty){
     val list: Seq[Phone] = allPhones
     
     list.foreach(phone => {
-      cacheByNumber.put(phone.number, phone)
+      cache.put(phone.id, phone)
     })
-  }*/
+  }
   
   def create (phone: Phone): Future[Long] = {
     val userId = (phones returning phones.map(_.id)) += Phone(0, phone.title, phone.number)
@@ -55,8 +55,7 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
   }
 
   def delete (id: Long): Unit = {
-    val phone = this.findById(id)
-    cacheByNumber.remove(phone.number)
+    cache.remove(id)
     db.run(phones.filter(_.id === id).delete)
   }
 
@@ -72,24 +71,26 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
   }
 
   def findById (id: Long): Phone = {
+    if (cache.containsKey(id)) {
+      return cache.get(id)
+    }
     val action = phones.filter(p => p.id === id).result
     val future: Future[Seq[Phone]] = db.run(action)
     val dbPhones = Await.result(future, Duration.Inf)
     if (dbPhones.nonEmpty) {
-      return dbPhones.head
+      val first = dbPhones.head
+      cache.put(first.id, first)
+      return first
     }
     null
   }
 
   def getByNumber (number: String): Phone = {
-    if (cacheByNumber.containsKey(number)) {
-      return cacheByNumber.get(number)
-    }
+   
     val future: Future[Seq[Phone]] = db.run(phones.filter(p => p.number === number).result)
     val dbPhones = Await.result(future, Duration.Inf)
     if (dbPhones.nonEmpty) {
       val first = dbPhones.head
-      cacheByNumber.put(first.number, first)
       return first
     }
     null
