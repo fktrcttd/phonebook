@@ -19,7 +19,7 @@ import play.api.libs.concurrent.CustomExecutionContext
 trait PhoneExecutionContext extends ExecutionContext
 
 class PhoneExecutionContextImpl @Inject() (system: ActorSystem)
-  extends CustomExecutionContext(system, "my.executor")
+  extends CustomExecutionContext(system, "phones.executor")
     with PhoneExecutionContext
 
 class PhoneController @Inject() (myExecutionContext: PhoneExecutionContext, repo: PhoneRepository, cc: ControllerComponents)
