@@ -17,7 +17,6 @@ module.exports = (env) => {
                 'bootstrap',
                 'bootstrap/dist/css/bootstrap.css',
                 'event-source-polyfill',
-                'isomorphic-fetch',
                 'jquery',
                 'vue',
                 'vue-router'
