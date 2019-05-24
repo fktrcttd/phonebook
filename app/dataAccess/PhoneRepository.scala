@@ -1,15 +1,14 @@
-package models
+package dataAccess
 
 import javax.inject.{Inject, Singleton}
+import models.Phone
 import play.api.db.slick.DatabaseConfigProvider
-import services.Cache
 import slick.jdbc.JdbcProfile
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future};
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
 class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  
   
   private val cacheByNumber = new Cache[String, Phone](10)
   
@@ -28,17 +27,17 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
 
     def * = (id, title, number) <> ((Phone.apply _).tupled, Phone.unapply)
   }
-
   private val phones = TableQuery[PhoneTable]
 
-  if (cacheByNumber.isEmpty){
+  
+  //cache init
+   /*if (cacheByNumber.isEmpty){
     val list: Seq[Phone] = allPhones
     
     list.foreach(phone => {
       cacheByNumber.put(phone.number, phone)
     })
-      
-  }
+  }*/
   
   def create (phone: Phone): Future[Long] = {
     val userId = (phones returning phones.map(_.id)) += Phone(0, phone.title, phone.number)
@@ -58,7 +57,6 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
   def delete (id: Long): Unit = {
     val phone = this.findById(id)
     cacheByNumber.remove(phone.number)
-    
     db.run(phones.filter(_.id === id).delete)
   }
 
@@ -96,7 +94,6 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
     }
     null
   }
-
 
   def edit (id: Long, title: String, number: String): Unit = {
     val titles = for {c <- phones if c.id === id} yield c.title

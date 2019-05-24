@@ -3,14 +3,14 @@ package controllers
 import java.nio.file.Paths
 
 import akka.actor.ActorSystem
+import api.models.PhoneApiModel
 import com.google.inject.ImplementedBy
+import dataAccess.PhoneRepository
 import javax.inject.Inject
-import models.ApiModels.PhoneApiModel
-import models.{Phone, PhoneRepository, PhoneValidator}
-import play.api.Play
+import models.Phone
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, BaseController, ControllerComponents, MessagesAbstractController, MessagesControllerComponents}
-import services.FileAsyncIO
+import services.{FileAsyncIO, PhoneValidator}
 
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.concurrent.CustomExecutionContext
@@ -22,7 +22,7 @@ class PhoneExecutionContextImpl @Inject() (system: ActorSystem)
   extends CustomExecutionContext(system, "phones.executor")
     with PhoneExecutionContext
 
-class PhoneController @Inject() (myExecutionContext: PhoneExecutionContext, repo: PhoneRepository, cc: ControllerComponents)
+class PhoneController @Inject() (phonesExecutionContext: PhoneExecutionContext, repo: PhoneRepository, cc: ControllerComponents)
   extends AbstractController(cc) {
 
 
@@ -31,7 +31,11 @@ class PhoneController @Inject() (myExecutionContext: PhoneExecutionContext, repo
   }
   
   def getById (id: Long): Action[AnyContent] = Action {
-    var json = Json.toJson(repo.findById(id))
+    val exist = repo.findById(id) != null
+    if (!exist){
+      NotFound("Not found!")
+    }
+    val json = Json.toJson(repo.findById(id))
     Ok(json)
   }
 
@@ -66,6 +70,11 @@ class PhoneController @Inject() (myExecutionContext: PhoneExecutionContext, repo
   }
 
   def edit (id: Long): Action[AnyContent] = Action { implicit request =>
+    val exist = repo.findById(id) != null
+    if (!exist){
+      NotFound("Not found!")
+    }
+    
     val json = request.body.asJson.get
     json.validate[PhoneApiModel] match {
       case success: JsSuccess[PhoneApiModel] =>
@@ -81,13 +90,17 @@ class PhoneController @Inject() (myExecutionContext: PhoneExecutionContext, repo
   }
 
   def delete (id: Long): Action[AnyContent] = Action {
+    val exist = repo.findById(id) != null
+    if (!exist){
+      NotFound("Not found!")
+    }
     repo.delete(id)
     Ok("Successfully deleted")
   }
   
   def writeAll: Action[AnyContent] = Action.async {
-    val future: Future[Unit] = FileAsyncIO.writeText("public/writeAll.txt",Json.toJson(repo.list()).toString())(myExecutionContext)
-    future.map(_ => Ok("Success"))(myExecutionContext)
+    val future: Future[Unit] = FileAsyncIO.writeText("public/AllPhones.json",Json.toJson(repo.list()).toString())(phonesExecutionContext)
+    future.map(_ => Ok("Success"))(phonesExecutionContext)
   }
     
 }

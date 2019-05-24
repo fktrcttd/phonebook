@@ -30,6 +30,10 @@ export default class List extends Vue {
     editDialog:Boolean=false;
     editValidator = new Validator(this.telephoneToEdit);
     
+    alertDialog:Boolean = false;
+    alertTitle:string = "";
+    alertBody:string = "";
+    
     mounted() {
       this.loadList();
     } 
@@ -96,7 +100,7 @@ export default class List extends Vue {
         }
         const data = {
             "title": this.telephoneToCreate.title,
-            "number": this.telephoneToCreate.title
+            "number": this.telephoneToCreate.number
         };
 
         axios.post('/api/phone/create', JSON.stringify(data), {
@@ -113,10 +117,15 @@ export default class List extends Vue {
             });
     }
     
+    showAlert(){
+        this.alertDialog= true;
+    }
+    
     cancel(){
         this.deleteDialog = false;
         this.editDialog = false;
         this.createDialog = false;
+        this.alertDialog = false;
     }
     
     loadList(){
@@ -130,6 +139,21 @@ export default class List extends Vue {
             .catch(function (error) {
                 // handle error
                 console.log(error);
+            })
+    }
+
+    writeAllToFile(){
+        axios.get("/api/writeall")
+            .then(data =>
+            {
+                this.alertTitle = "Успешно";
+                this.alertBody = "Данные успешно сохранены в файл";
+                this.showAlert();
+            })
+            .catch(reason =>  {
+                this.alertTitle= "Ошибка";
+                this.alertBody = "При сохранении данных в файл что-то пошло не так.";
+                this.showAlert();
             })
     }
     

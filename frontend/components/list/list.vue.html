@@ -1,11 +1,11 @@
-<template xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<template xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
     <div>
         <h2 class="align-content-center">Список номеров</h2>
         <div class="row mb-2">
 
             <div class="tight-gutter pl-3 mr-2">
                 <Debounce :timeout="500" events="input">
-                    <input type="text" class="form-control mr-3" placeholder="Поиск" v-model="search">
+                    <input type="text" class="form-control mr-3 search-line" placeholder="Поиск" v-model="search">
                 </Debounce>
             </div>
             <div class="tight-gutter">
@@ -24,9 +24,9 @@
                     </div>
                 </div>
             </div>
-            <div class="tight-gutter"></div>
-            <div class="tight-gutter align-content-end">
-                <button class="btn btn-outline-success float-right" @click="showCreateModal()">Добавить</button>
+            <div class="tight-gutter last-in-top-row pr-3">
+                <button class="btn btn-outline-success " @click="showCreateModal()">Добавить</button>
+                <button class="btn btn-outline-warning " @click="writeAllToFile()">Записать в файл</button>
             </div>
 
         </div>
@@ -64,6 +64,14 @@
         </table>
 
 
+
+        <modal-component :title="alertTitle" :show.sync="alertDialog" @ok="cancel" @cancel="cancel">
+            <div>
+                <p>{{alertBody}}</p>
+            </div>
+        </modal-component>
+        
+        
         <modal-component title="Удаление" :show.sync="deleteDialog" @ok="deleteTelephone" @cancel="cancel">
             <div>
                 <p>Вы действительно хотите удалить {{telephoneToDelete.title}} - {{telephoneToDelete.number}}?</p>

@@ -1,5 +1,5 @@
 <template>
-    <nav id="sidebar" class="">
+    <nav id="sidebar">
         <router-link to="/" exact>
             <div class="sidebar-header">
                 <h3>Телефонный справочник</h3>
@@ -11,7 +11,7 @@
                 <router-link to="/" exact active-class="active">Список</router-link>
             </li>
             <li>
-                <router-link to="/create">Статистика</router-link>
+                <router-link to="/about" active-class="active">Описание</router-link>
             </li>
         </ul>
 
@@ -28,4 +28,4 @@
 
 </template>
 
-<script src="./sidebar.ts"></script>
+<style src="./sidebar.css"></style>

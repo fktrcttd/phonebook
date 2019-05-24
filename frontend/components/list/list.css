@@ -1,5 +1,15 @@
 .tight-gutter {
     max-width: 680px;
-    min-width: 380px;
     padding: 0 2px;
+}
+
+input.search-line {
+    max-width: 680px;
+    min-width: 400px;
+}
+.last-in-top-row{
+    margin-left: auto;
+}
+label.btn{
+    cursor: pointer;
 }

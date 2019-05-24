@@ -1,4 +1,4 @@
-package models.ApiModels
+package api.models
 
 import play.api.libs.json.Json
 

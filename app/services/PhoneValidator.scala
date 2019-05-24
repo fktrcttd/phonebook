@@ -1,16 +1,16 @@
-package models
+package services
 
-import models.ApiModels.PhoneApiModel
+import api.models.PhoneApiModel
 
 object PhoneValidator {
 
 private def numberIsValid(num:String):Boolean = {
-    val isMatch =num.matches("^(?:\\+|\\d)[\\d\\-\\(\\) ]{16}\\d$"); 
+    val isMatch =num.matches("^(?:\\+|\\d)[\\d\\-\\(\\) ]{16}\\d$")
     isMatch
   }
   
   private def titleIsValid(title:String):Boolean = {
-    title.isEmpty
+    !title.isEmpty
   }
   
   def telIsValid(tel:PhoneApiModel):Boolean ={

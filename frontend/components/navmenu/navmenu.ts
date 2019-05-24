@@ -4,23 +4,24 @@ import { Component } from 'vue-property-decorator';
 @Component
 export default class NavmenuComponent extends Vue {
     
-    sidebarShown = true;
+    sidebarHidden = false;
     toggleSidebar () {
         var sidebar = document.getElementById("sidebar");
-        this.sidebarShown = !this.sidebarShown;
-        // if (sidebar != null) {
-        //     if (this.sidebarShown) {
-        //         var name, arr;
-        //         name = "mystyle";
-        //         arr = sidebar.className.split(" ");
-        //         if (arr.indexOf(name) == -1) {
-        //             sidebar.className += " " + name;
-        //         }
-        //     }
-        //     else {
-        //         sidebar.className = sidebar.className.replace(/\bactive\b/g, "");
-        //     }
-        // }
+        console.log(sidebar);
+        this.sidebarHidden = !this.sidebarHidden;
+        if (sidebar != null) {
+            if (this.sidebarHidden) {
+                var name, arr;
+                name = "hidden";
+                arr = sidebar.className.split(" ");
+                if (arr.indexOf(name) == -1) {
+                    sidebar.className += " " + name;
+                }
+            }
+            else {
+                sidebar.className = sidebar.className.replace(/\bhidden\b/g, "");
+            }
+        }
         
         
     }

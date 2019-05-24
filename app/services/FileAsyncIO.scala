@@ -8,6 +8,7 @@ import java.nio.file.StandardOpenOption._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.Try
 
+//https://gist.github.com/tovbinm/f73849aff169d1ebeb97
 /**
   * File asynchronous IO wrapper around java.nio.file for scala Futures
   */

@@ -1,0 +1,54 @@
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #424242;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+#sidebar.hidden {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #212121;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid #BDBDBD;
+}
+
+#sidebar h3{
+    color: #FAFAFA;
+}
+
+#sidebar a{
+    text-decoration: none;
+    color: #FAFAFA;
+}
+#sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+
+#sidebar ul li a:hover {
+    color: #212121 ;
+    background: #fff;
+}
+
+#sidebar ul li a.active{
+    color: #FAFAFA;
+    background: #a0a0a0;
+}

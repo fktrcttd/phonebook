@@ -11,6 +11,7 @@ Vue.use(VueRouter);
 
 const routes = [
     { path: '/', component: require('./components/list/list.vue.html').default },
+    { path: '/about', component: require('./components/about/about.vue.html').default }
 ];
 
 new Vue({
