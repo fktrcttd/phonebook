@@ -1,0 +1,31 @@
+<template>
+    <nav id="sidebar" class="">
+        <router-link to="/" exact>
+            <div class="sidebar-header">
+                <h3>Телефонный справочник</h3>
+            </div>
+        </router-link>
+
+        <ul class="list-unstyled components">
+            <li>
+                <router-link to="/" exact active-class="active">Список</router-link>
+            </li>
+            <li>
+                <router-link to="/create">Статистика</router-link>
+            </li>
+        </ul>
+
+        <footer class="">
+            <div class="navbar-fixed-bottom row-fluid">
+                <div class="navbar-inner">
+                    <div class="container">
+                        &copy; 2019 - Телефонный справочник
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </nav>
+
+</template>
+
+<script src="./sidebar.ts"></script>

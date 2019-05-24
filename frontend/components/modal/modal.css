@@ -1,0 +1,26 @@
+.modal {
+    display: block;
+}
+.modal-transition {
+    transition: all .6s ease;
+}
+.modal-leave {
+    /* 样式没什么用，但可以让根标签的transitionEnd生效，以去掉modal-leave */
+    border-radius: 1px !important;
+}
+.modal-transition .modal-dialog, .modal-transition .modal-backdrop {
+    transition: all .5s ease;
+}
+.modal-enter .modal-dialog, .modal-leave .modal-dialog {
+    opacity: 0;
+    transform: translateY(-30%);
+}
+.modal-enter .modal-backdrop, .modal-leave .modal-backdrop {
+    opacity: 0;
+}
+
+.modal-backdrop{
+    background-color: #999999;
+    opacity: 0.7;
+}
+

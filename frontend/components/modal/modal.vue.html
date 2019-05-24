@@ -1,0 +1,36 @@
+<template >
+    <div v-show="show" :transition="transition">
+        <div class="modal" @click.self="cancel">
+            <div class="modal-dialog modal-lg" >
+                <div class="modal-content">
+                    <!--Header-->
+                    <div class="modal-header">
+                        <slot name="header">
+                            <h4 class="modal-title">
+                                <slot name="title">
+                                    {{title}}
+                                </slot>
+                            </h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"  @click="cancel"><span aria-hidden="true">&times;</span></button>
+                        </slot>
+                    </div>
+                    <!--Container-->
+                    <div class="modal-body">
+                        <slot></slot>
+                    </div>
+                    <!--Footer-->
+                    <div class="modal-footer">
+                        <slot name="footer">
+                            <button type="button" class="btn btn-outline-danger" @click="cancel">{{cancelText}}</button>
+                            <button type="button" class="btn btn-outline-primary" @click="ok">{{okText}}</button>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop in"></div>
+    </div>
+</template>
+
+<style src="./modal.css"/>
+<script src="./modal.ts"></script>

@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const bundleOutputDir = './public/dist';
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
@@ -15,6 +15,10 @@ module.exports = (env) => {
         context: __dirname,
         resolve: { extensions: [ '.js', '.ts' ] },
         entry: { 'main': './frontend/boot.ts' },
+        devServer:{
+            hot:true,
+            contentBase: './public/dist'
+        },
         module: {
             rules: [
                 { test: /\.vue\.html$/, include: /frontend/, loader: 'vue-loader', options: { loaders: { js: 'ts-loader' } } },
@@ -47,6 +51,7 @@ module.exports = (env) => {
                 manifest: require('./public/dist/vendor-manifest.json')
             })
         ].concat(isDevBuild ? [
+            
             // Plugins that apply in development builds only
             new webpack.SourceMapDevToolPlugin({
                 filename: '[file].map', // Remove this line if you prefer inline source maps
@@ -55,7 +60,8 @@ module.exports = (env) => {
         ] : [
             // Plugins that apply in production builds only
             new UglifyJsPlugin(),
-            new ExtractTextPlugin('site.css')
+            new ExtractTextPlugin('site.css'),
+            new webpack.HotModuleReplacementPlugin()
         ])
     }];
 };

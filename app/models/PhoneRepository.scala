@@ -2,79 +2,110 @@ package models
 
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
+import services.Cache
 import slick.jdbc.JdbcProfile
-
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future};
 
 @Singleton
-class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext){
+class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+  
+  
+  private val cacheByNumber = new Cache[String, Phone](10)
+  
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
+
   import dbConfig._
   import profile.api._
-  private class PhoneTable(tag: Tag ) extends Table[Phone](tag, "phones"){
+
+  private class PhoneTable (tag: Tag) extends Table[Phone](tag, "phones") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+
     def title = column[String]("title")
+
     def number = column[String]("number")
+
     def * = (id, title, number) <> ((Phone.apply _).tupled, Phone.unapply)
   }
 
   private val phones = TableQuery[PhoneTable]
 
-  def create(phone: Phone) = {
+  if (cacheByNumber.isEmpty){
+    val list: Seq[Phone] = allPhones
+    
+    list.foreach(phone => {
+      cacheByNumber.put(phone.number, phone)
+    })
+      
+  }
+  
+  def create (phone: Phone): Future[Long] = {
     val userId = (phones returning phones.map(_.id)) += Phone(0, phone.title, phone.number)
     db.run(userId)
   }
+
+  private def allPhones: Seq[Phone] ={
+    val phonesFromDb: Future[Seq[Phone]] = db.run( phones.result)
+    val list: Seq[Phone] = Await.result(phonesFromDb, Duration.Inf)
+    list
+  } 
   
-  def list():Seq[Phone] = {
-    val where = phones.result
-    val phonesFromDb: Future[Seq[Phone]] = db.run(where)
-    Await.result(phonesFromDb, Duration.Inf)
+  def list (): Seq[Phone] = {
+    allPhones
   }
 
-  def delete(id: Long) ={
-    val q = phones.filter(_.id === id)
-    val action = q.delete
-    val affectedRowsCount: Future[Int] = db.run(action)
-    val sql = action.statements.head
-    println("Удалено строк" + affectedRowsCount.toString)
-    println("SQL код" + sql)
-  }
-  
-  def searchByName (title: String) = {
-    val where = phones.result
-    val phonesFromDb: Future[Seq[Phone]] = db.run(where)
-    val list = Await.result(phonesFromDb, Duration.Inf).toList
-    list.filter(p => p.title.toLowerCase().contains(title))
-  }
-  
-  def searchByNumber (number: String) = {
-    val where = phones.result
-    val phonesFromDb: Future[Seq[Phone]] = db.run(where)
-    val list = Await.result(phonesFromDb, Duration.Inf).toList
-    list.filter(_.number.toLowerCase().contains(number))
+  def delete (id: Long): Unit = {
+    val phone = this.findById(id)
+    cacheByNumber.remove(phone.number)
+    
+    db.run(phones.filter(_.id === id).delete)
   }
 
-  def readById (id:Long)= {
-    val where = phones.filter(p =>p.id ===id)
-    val action = where.result
-    val phonesFromDb: Future[Seq[Phone]] = db.run(action)
-    val sql = action.statements.head
-    val r = Await.result(phonesFromDb, Duration.Inf)
-    r.head
+  def searchByName (title: String): List[Phone] = {
+    val phonesFromDb: Future[Seq[Phone]] =
+      db.run(phones.filter(t => t.title.toLowerCase.like(s"%${title.toLowerCase}%")).result)
+    Await.result(phonesFromDb, Duration.Inf).toList
   }
 
-  def edit(id:Long, title:String, number: String) = {
-    val titles = for { c <- phones if c.id === id } yield c.title
+  def searchByNumber (number: String): List[Phone] = {
+    val phonesFromDb: Future[Seq[Phone]] = db.run(phones.filter(t => t.number.like(s"%$number%")).result)
+    Await.result(phonesFromDb, Duration.Inf).toList
+  }
+
+  def findById (id: Long): Phone = {
+    val action = phones.filter(p => p.id === id).result
+    val future: Future[Seq[Phone]] = db.run(action)
+    val dbPhones = Await.result(future, Duration.Inf)
+    if (dbPhones.nonEmpty) {
+      return dbPhones.head
+    }
+    null
+  }
+
+  def getByNumber (number: String): Phone = {
+    if (cacheByNumber.containsKey(number)) {
+      return cacheByNumber.get(number)
+    }
+    val future: Future[Seq[Phone]] = db.run(phones.filter(p => p.number === number).result)
+    val dbPhones = Await.result(future, Duration.Inf)
+    if (dbPhones.nonEmpty) {
+      val first = dbPhones.head
+      cacheByNumber.put(first.number, first)
+      return first
+    }
+    null
+  }
+
+
+  def edit (id: Long, title: String, number: String): Unit = {
+    val titles = for {c <- phones if c.id === id} yield c.title
     val updateTitleAction = titles.update(title)
-    val updTitleSql = titles.updateStatement
 
-    val numbers = for { c <- phones if c.id === id } yield c.number
+    val numbers = for {c <- phones if c.id === id} yield c.number
     val updateNumberAction = numbers.update(number)
-    val numbersSql = numbers.updateStatement
 
-   val q = db.run(updateTitleAction)
-   val q1 = db.run(updateNumberAction)
+    db.run(updateTitleAction)
+    db.run(updateNumberAction)
   }
 }
