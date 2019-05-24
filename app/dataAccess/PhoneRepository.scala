@@ -30,14 +30,7 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
   private val phones = TableQuery[PhoneTable]
 
   
-  //cache init
-   if (cache.isEmpty){
-    val list: Seq[Phone] = allPhones
-    
-    list.foreach(phone => {
-      cache.put(phone.id, phone)
-    })
-  }
+
   
   def create (phone: Phone): Future[Long] = {
     val userId = (phones returning phones.map(_.id)) += Phone(0, phone.title, phone.number)
@@ -51,6 +44,15 @@ class PhoneRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impli
   } 
   
   def list (): Seq[Phone] = {
+
+    //плохое место для инициализации
+    if (cache.isEmpty){
+      val list: Seq[Phone] = allPhones
+
+      list.foreach(phone => {
+        cache.put(phone.id, phone)
+      })
+    }
     allPhones
   }
 
