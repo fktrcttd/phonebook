@@ -6,7 +6,7 @@
 1.  Scala, SBT.  
     Инструкцию по установке для Ubuntu 18.04 можно найти [здесь](http://www.codebind.com/linux-tutorials/install-scala-sbt-java-ubuntu-18-04-lts-linux/)
 2.  PostgreSQL  
-    Инструкцию по установке для Ubuntu 18.04 можно найти  [здесь](https://hostadvice.com/how-to/how-to-install-postgresql-database-server-on-ubuntu-18-04/) 
+    Инструкцию по установке для Ubuntu 18.04 можно найти  [здесь](https://hostadvice.com/how-to/how-to-install-postgresql-database-server-on-ubuntu-18-04/). После установки необходимо создать пустую базу данных, например, через PgAdmin (приложение не умеет создавать БД, если ее нет). 
 3.  Node и NPM  
     Инструкцию по установке для Ubuntu 18.04 можно найти  [здесь](https://linuxize.com/post/how-to-install-node-js-on-ubuntu-18.04/)
 4.    
